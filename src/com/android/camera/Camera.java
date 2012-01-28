@@ -49,6 +49,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.MessageQueue;
+import android.os.SystemProperties;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
@@ -123,6 +124,11 @@ public class Camera extends BaseCamera implements View.OnClickListener,
     private static final int ZOOM_STOPPED = 0;
     private static final int ZOOM_START = 1;
     private static final int ZOOM_STOPPING = 2;
+
+    // Property that indicates that the device screen is rotated by default
+    // Necesary to adjust the rotation of pictures/movies (0, 90, 180, 270)
+    private static final int mDeviceScreenRotation =
+       SystemProperties.getInt("ro.device.screenrotation", 0);
 
     private int mZoomState = ZOOM_STOPPED;
     private boolean mSmoothZoomSupported = false;
@@ -228,6 +234,8 @@ public class Camera extends BaseCamera implements View.OnClickListener,
     private int mImageWidth = 0;
     private int mImageHeight = 0;
 
+    private boolean mFocusMute = false;
+
     /**
      * This Handler is used to post message back onto the main thread of the
      * application
@@ -301,6 +309,8 @@ public class Camera extends BaseCamera implements View.OnClickListener,
     private void initializeFirstTime() {
         if (mFirstTimeInitialized) return;
 
+	mFocusMute = (Settings.System.getInt(getContentResolver(),
+                Settings.System.CAMERA_FOCUS_MUTE, 0) == 1);
         // Create orientation listenter. This should be done first because it
         // takes some time to get first orientation.
         mOrientationListener = new MyOrientationEventListener(Camera.this);
@@ -688,7 +698,7 @@ public class Camera extends BaseCamera implements View.OnClickListener,
                 // User is half-pressing the focus key. Play the focus tone.
                 // Do not take the picture now.
                 ToneGenerator tg = mFocusToneGenerator;
-                if (tg != null) {
+                if (tg != null && !mFocusMute) {
                     tg.startTone(ToneGenerator.TONE_PROP_BEEP2);
                 }
                 if (focused) {
@@ -813,11 +823,10 @@ public class Camera extends BaseCamera implements View.OnClickListener,
             int rotation = 0;
             if (mOrientation != OrientationEventListener.ORIENTATION_UNKNOWN) {
                 CameraInfo info = CameraHolder.instance().getCameraInfo()[mCameraId];
-                if (info.facing == CameraInfo.CAMERA_FACING_FRONT &&
-                        info.orientation != 90) {
-                    rotation = (info.orientation - mOrientation + 360) % 360;
+                if (info.facing == CameraInfo.CAMERA_FACING_FRONT && info.orientation != 90) {
+                    rotation = (info.orientation - mOrientation + mDeviceScreenRotation + 360) % 360;
                 } else {  // back-facing camera (or acting like it)
-                    rotation = (info.orientation + mOrientation) % 360;
+                    rotation = (mOrientation - mDeviceScreenRotation + 90) % 360;
                 }
             }
             mParameters.setRotation(rotation);
@@ -1380,6 +1389,9 @@ public class Camera extends BaseCamera implements View.OnClickListener,
         mJpegPictureCallbackTime = 0;
         mZoomValue = 0;
         mImageCapture = new ImageCapture();
+
+	mFocusMute = (Settings.System.getInt(getContentResolver(),
+                Settings.System.CAMERA_FOCUS_MUTE, 0) == 1);
 
         // Start the preview if it is not started.
         if (!mPreviewing && !mStartPreviewFail) {

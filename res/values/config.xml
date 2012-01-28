@@ -37,10 +37,10 @@
 	<string name="filtered_pictureSizes"></string>
 
 	<!-- Wide media profile available -->
-	<bool name="supportsWideProfile">false</bool>
+	<bool name="supportsWideProfile">true</bool>
 
 	<!-- High Framerate 1080p for Nvidia Cameras -->
-	<bool name="supportsNvHighBitrateFullHD">false</bool>
+	<bool name="supportsNvHighBitrateFullHD">true</bool>
 
 	<!-- Samsung Camcorder Mode -->
 	<bool name="needsSamsungCamMode">false</bool>
