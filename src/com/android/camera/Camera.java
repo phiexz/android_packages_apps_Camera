@@ -309,8 +309,9 @@ public class Camera extends BaseCamera implements View.OnClickListener,
     private void initializeFirstTime() {
         if (mFirstTimeInitialized) return;
 
-	mFocusMute = (Settings.System.getInt(getContentResolver(),
+        mFocusMute = (Settings.System.getInt(getContentResolver(),
                 Settings.System.CAMERA_FOCUS_MUTE, 0) == 1);
+
         // Create orientation listenter. This should be done first because it
         // takes some time to get first orientation.
         mOrientationListener = new MyOrientationEventListener(Camera.this);
@@ -1390,7 +1391,7 @@ public class Camera extends BaseCamera implements View.OnClickListener,
         mZoomValue = 0;
         mImageCapture = new ImageCapture();
 
-	mFocusMute = (Settings.System.getInt(getContentResolver(),
+        mFocusMute = (Settings.System.getInt(getContentResolver(),
                 Settings.System.CAMERA_FOCUS_MUTE, 0) == 1);
 
         // Start the preview if it is not started.
