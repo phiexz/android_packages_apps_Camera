@@ -234,7 +234,6 @@ public class Camera extends BaseCamera implements View.OnClickListener,
     private int mImageWidth = 0;
     private int mImageHeight = 0;
 
-    private boolean mFocusMute = false;
 
     /**
      * This Handler is used to post message back onto the main thread of the
@@ -309,8 +308,6 @@ public class Camera extends BaseCamera implements View.OnClickListener,
     private void initializeFirstTime() {
         if (mFirstTimeInitialized) return;
 
-        mFocusMute = (Settings.System.getInt(getContentResolver(),
-                Settings.System.CAMERA_FOCUS_MUTE, 0) == 1);
 
         // Create orientation listenter. This should be done first because it
         // takes some time to get first orientation.
@@ -699,7 +696,7 @@ public class Camera extends BaseCamera implements View.OnClickListener,
                 // User is half-pressing the focus key. Play the focus tone.
                 // Do not take the picture now.
                 ToneGenerator tg = mFocusToneGenerator;
-                if (tg != null && !mFocusMute) {
+                if (tg != null) {
                     tg.startTone(ToneGenerator.TONE_PROP_BEEP2);
                 }
                 if (focused) {
@@ -1390,9 +1387,6 @@ public class Camera extends BaseCamera implements View.OnClickListener,
         mJpegPictureCallbackTime = 0;
         mZoomValue = 0;
         mImageCapture = new ImageCapture();
-
-        mFocusMute = (Settings.System.getInt(getContentResolver(),
-                Settings.System.CAMERA_FOCUS_MUTE, 0) == 1);
 
         // Start the preview if it is not started.
         if (!mPreviewing && !mStartPreviewFail) {
