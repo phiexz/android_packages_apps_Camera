@@ -52,6 +52,7 @@ import android.os.MessageQueue;
 import android.os.SystemProperties;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
@@ -863,6 +864,12 @@ public class Camera extends BaseCamera implements View.OnClickListener,
                 } else {
                     loc = null;
                 }
+            }
+
+            long dateTaken = System.currentTimeMillis();
+            if (dateTaken != 0) {
+                String datetime = DateFormat.format("yyyy:MM:dd kk:mm:ss", dateTaken).toString();
+                mParameters.set("exif-datetime",datetime);
             }
 
             mCameraDevice.setParameters(mParameters);
